@@ -1,0 +1,35 @@
+{
+  "name": "obsidian-vertical-tabs-api",
+  "version": "1.0.0",
+  "description": "Public API for customizing tabs and groups in the Vertical Tabs plugin for Obsidian",
+  "main": "index.d.ts",
+  "types": "index.d.ts",
+  "files": [
+    "index.d.ts",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "obsidian",
+    "obsidian-plugin",
+    "vertical-tabs",
+    "api",
+    "typescript"
+  ],
+  "author": "oxdc",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/oxdc/obsidian-vertical-tabs-api.git"
+  },
+  "homepage": "https://github.com/oxdc/obsidian-vertical-tabs-api#readme",
+  "bugs": {
+    "url": "https://github.com/oxdc/obsidian-vertical-tabs/issues"
+  },
+  "peerDependencies": {
+    "obsidian": "^1.6.2"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
