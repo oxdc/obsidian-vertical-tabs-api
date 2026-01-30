@@ -46,17 +46,6 @@ export interface APIGroupMetadata {
   title?: string;
 }
 
-/**
- * Current state of a tab
- */
-export interface APITabState {
-  /** Whether the tab is pinned */
-  pinned: boolean;
-  /** Whether the tab is ephemeral (preview mode) */
-  ephemeral: boolean;
-  /** The WorkspaceLeaf object */
-  leaf: WorkspaceLeaf;
-}
 
 /**
  * Event data emitted when metadata changes
@@ -164,24 +153,7 @@ export declare class VerticalTabsAPI {
    */
   clearGroupMetadata(groupId: Identifier): Promise<void>;
 
-  // ===== Tab State Management =====
-
-  /**
-   * Set ephemeral state for a tab
-   * Note: Does not trigger metadata change events
-   * @param leafId - ID of the WorkspaceLeaf
-   * @param isEphemeral - Whether the tab should be ephemeral (preview mode)
-   */
-  setEphemeralState(leafId: Identifier, isEphemeral: boolean): void;
-
-  /**
-   * Get current state of a tab
-   * @param leafId - ID of the WorkspaceLeaf
-   * @returns Tab state or undefined if tab not found
-   */
-  getTabState(leafId: Identifier): APITabState | undefined;
-
-  // ===== Utilities =====
+	// ===== Utilities =====
 
   /**
    * Get API version
