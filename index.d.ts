@@ -51,12 +51,14 @@ export interface APIGroupMetadata {
  * Event data emitted when metadata changes
  */
 export interface MetadataChangeEvent {
-  /** Type of entity that changed */
-  type: "tab" | "group";
-  /** ID of the entity that changed */
-  id: Identifier;
-  /** Updated metadata */
-  metadata: APITabMetadata | APIGroupMetadata;
+	/** Type of entity that changed */
+	type: "tab" | "group";
+	/** ID of the entity that changed */
+	id: Identifier;
+	/** Updated metadata */
+	metadata: APITabMetadata | APIGroupMetadata;
+	/** Source plugin that triggered the change (optional) */
+	source?: string;
 }
 
 /**
@@ -66,9 +68,12 @@ export interface MetadataChangeEvent {
  * ```typescript
  * const vtPlugin = app.plugins.getPlugin("vertical-tabs");
  * if (vtPlugin?.api) {
- *   await vtPlugin.api.setTabIcon(leaf.id, "check");
+ *   await vtPlugin.api.setTabIcon(leaf.id, "check", "my-plugin");
  * }
  * ```
+ * 
+ * Important: Always provide a source parameter to prevent infinite loops
+ * when listening to metadata change events.
  */
 export declare class VerticalTabsAPI {
   constructor(plugin: any);
@@ -79,25 +84,28 @@ export declare class VerticalTabsAPI {
    * Set custom icon for a tab
    * @param leafId - ID of the WorkspaceLeaf
    * @param icon - Lucide icon name (e.g., "check", "file-text")
+   * @param source - Optional source identifier to prevent infinite loops
    * @returns Promise that resolves when the icon is set
    */
-  setTabIcon(leafId: Identifier, icon: string): Promise<void>;
+  setTabIcon(leafId: Identifier, icon: string, source?: string): Promise<void>;
 
   /**
    * Set custom color for a tab
    * @param leafId - ID of the WorkspaceLeaf
    * @param color - CSS color string (e.g., "#ff0000", "red", "rgb(255,0,0)")
+   * @param source - Optional source identifier to prevent infinite loops
    * @returns Promise that resolves when the color is set
    */
-  setTabColor(leafId: Identifier, color: string): Promise<void>;
+  setTabColor(leafId: Identifier, color: string, source?: string): Promise<void>;
 
   /**
    * Set custom title for a tab
    * @param leafId - ID of the WorkspaceLeaf
    * @param title - Custom title text
+   * @param source - Optional source identifier to prevent infinite loops
    * @returns Promise that resolves when the title is set
    */
-  setTabTitle(leafId: Identifier, title: string): Promise<void>;
+  setTabTitle(leafId: Identifier, title: string, source?: string): Promise<void>;
 
   /**
    * Get current metadata for a tab
@@ -109,49 +117,54 @@ export declare class VerticalTabsAPI {
   /**
    * Clear all custom metadata for a tab
    * @param leafId - ID of the WorkspaceLeaf
+   * @param source - Optional source identifier to prevent infinite loops
    * @returns Promise that resolves when metadata is cleared
    */
-  clearTabMetadata(leafId: Identifier): Promise<void>;
+  clearTabMetadata(leafId: Identifier, source?: string): Promise<void>;
 
   // ===== Group Customization =====
 
-  /**
-   * Set custom icon for a group
-   * @param groupId - ID of the WorkspaceParent
-   * @param icon - Lucide icon name (e.g., "folder", "star")
-   * @returns Promise that resolves when the icon is set
-   */
-  setGroupIcon(groupId: Identifier, icon: string): Promise<void>;
+	/**
+	 * Set custom icon for a group
+	 * @param groupId - ID of the WorkspaceParent
+	 * @param icon - Lucide icon name (e.g., "folder", "star")
+	 * @param source - Optional source identifier to prevent infinite loops
+	 * @returns Promise that resolves when the icon is set
+	 */
+	setGroupIcon(groupId: Identifier, icon: string, source?: string): Promise<void>;
 
-  /**
-   * Set custom color for a group
-   * @param groupId - ID of the WorkspaceParent
-   * @param color - CSS color string (e.g., "#00ff00", "green", "rgb(0,255,0)")
-   * @returns Promise that resolves when the color is set
-   */
-  setGroupColor(groupId: Identifier, color: string): Promise<void>;
+	/**
+	 * Set custom color for a group
+	 * @param groupId - ID of the WorkspaceParent
+	 * @param color - CSS color string (e.g., "#00ff00", "green", "rgb(0,255,0)")
+	 * @param source - Optional source identifier to prevent infinite loops
+	 * @returns Promise that resolves when the color is set
+	 */
+	setGroupColor(groupId: Identifier, color: string, source?: string): Promise<void>;
 
-  /**
-   * Set custom title for a group
-   * @param groupId - ID of the WorkspaceParent
-   * @param title - Custom title text
-   * @returns Promise that resolves when the title is set
-   */
-  setGroupTitle(groupId: Identifier, title: string): Promise<void>;
+	/**
+	 * Set custom title for a group
+	 * @param groupId - ID of the WorkspaceParent
+	 * @param title - Custom title text
+	 * @param source - Optional source identifier to prevent infinite loops
+	 * @returns Promise that resolves when the title is set
+	 */
+	setGroupTitle(groupId: Identifier, title: string, source?: string): Promise<void>;
 
-  /**
-   * Get current metadata for a group
-   * @param groupId - ID of the WorkspaceParent
-   * @returns Promise that resolves to group metadata or undefined if not found
-   */
-  getGroupMetadata(groupId: Identifier): Promise<APIGroupMetadata | undefined>;
+	/**
+	 * Get current metadata for a group
+	 * @param groupId - ID of the WorkspaceParent
+	 * @returns Promise that resolves to group metadata or undefined if not found
+	 */
+	getGroupMetadata(groupId: Identifier): Promise<APIGroupMetadata | undefined>;
 
-  /**
-   * Clear all custom metadata for a group
-   * @param groupId - ID of the WorkspaceParent
-   * @returns Promise that resolves when metadata is cleared
-   */
-  clearGroupMetadata(groupId: Identifier): Promise<void>;
+	/**
+	 * Clear all custom metadata for a group
+	 * @param groupId - ID of the WorkspaceParent
+	 * @param source - Optional source identifier to prevent infinite loops
+	 * @returns Promise that resolves when metadata is cleared
+	 */
+	clearGroupMetadata(groupId: Identifier, source?: string): Promise<void>;
 
 	// ===== Utilities =====
 
