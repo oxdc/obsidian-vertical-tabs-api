@@ -31,9 +31,23 @@ export default class MyPlugin extends Plugin {
     // Customize tabs and groups
     const activeLeaf = api.getActiveLeaf();
     if (activeLeaf) {
-      await api.setTabIcon(activeLeaf.id, "star");
-      await api.setTabColor(activeLeaf.id, "#ff0000");
+      await api.setTabIcon(activeLeaf.id, "star", "my-plugin");
+      await api.setTabColor(activeLeaf.id, "#ff0000", "my-plugin");
     }
+
+    // Register custom menu items
+    this.registerEvent(
+      api.onTabMenu((menu, leaf) => {
+        menu.addItem((item) => {
+          item
+            .setTitle("My custom action")
+            .setSection("my-plugin")
+            .onClick(() => {
+              console.log("Custom action for tab:", leaf.id);
+            });
+        });
+      })
+    );
   }
 }
 ```

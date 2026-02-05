@@ -6,7 +6,14 @@
  * @packageDocumentation
  */
 
-import { WorkspaceLeaf, WorkspaceParent } from "obsidian";
+import { WorkspaceLeaf, WorkspaceParent, Menu } from "obsidian";
+
+/**
+ * Event reference for menu callbacks
+ */
+export interface MenuEventRef {
+  unload: () => void;
+}
 
 /**
  * Unique identifier for tabs and groups
@@ -211,6 +218,26 @@ export declare class VerticalTabsAPI {
    * @returns Array of group IDs
    */
   getAllGroupIds(): Identifier[];
+
+  // ===== Menu Customization =====
+
+  /**
+   * Register a callback to add custom menu items to tab context menus
+   * 
+   * @param callback - Function called when a tab menu is being built.
+   *                   Receives the Menu instance and the WorkspaceLeaf.
+   * @returns MenuEventRef that can be used to unregister the callback
+   */
+  onTabMenu(callback: (menu: Menu, leaf: WorkspaceLeaf) => void): MenuEventRef;
+
+  /**
+   * Register a callback to add custom menu items to group context menus
+   * 
+   * @param callback - Function called when a group menu is being built.
+   *                   Receives the Menu instance and the WorkspaceParent.
+   * @returns MenuEventRef that can be used to unregister the callback
+   */
+  onGroupMenu(callback: (menu: Menu, group: WorkspaceParent) => void): MenuEventRef;
 }
 
 /**
