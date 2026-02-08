@@ -71,6 +71,20 @@ export interface MetadataChangeEvent {
 }
 
 /**
+ * Event data emitted when tabs/groups are opened or closed
+ */
+export interface RefreshEvent {
+  /** IDs of newly opened tabs */
+  newTabs: Identifier[];
+  /** IDs of newly created groups */
+  newGroups: Identifier[];
+  /** IDs of closed tabs */
+  closedTabs: Identifier[];
+  /** IDs of closed groups */
+  closedGroups: Identifier[];
+}
+
+/**
  * Main public API for Vertical Tabs plugin
  *
  * Access this API from other plugins via:
@@ -320,6 +334,13 @@ export interface VerticalTabsPlugin {
  *     console.log(`${event.type} ${event.id} changed by ${event.source}`);
  *   })
  * );
+ *
+ * // Tabs or groups opened/closed
+ * this.registerEvent(
+ *   this.app.workspace.on("vertical-tabs:refresh", (event) => {
+ *     console.log(`New tabs: ${event.newTabs.length}, Closed: ${event.closedTabs.length}`);
+ *   })
+ * );
  * ```
  */
 declare module "obsidian" {
@@ -330,5 +351,7 @@ declare module "obsidian" {
     on(name: "vertical-tabs:unload", callback: () => void): EventRef;
     /** Fired when tab or group metadata changes */
     on(name: "vertical-tabs:metadata-changed", callback: (event: MetadataChangeEvent) => void): EventRef;
+    /** Fired when tabs or groups are opened or closed (only if changes detected) */
+    on(name: "vertical-tabs:refresh", callback: (event: RefreshEvent) => void): EventRef;
   }
 }
