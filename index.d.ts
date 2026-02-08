@@ -10,8 +10,11 @@ import { WorkspaceLeaf, WorkspaceParent, Menu } from "obsidian";
 
 /**
  * Event reference for menu callbacks
+ *
+ * Call `unload()` to unregister the callback
  */
 export interface MenuEventRef {
+  /** Unregister the menu callback */
   unload: () => void;
 }
 
@@ -53,19 +56,18 @@ export interface APIGroupMetadata {
   title?: string;
 }
 
-
 /**
  * Event data emitted when metadata changes
  */
 export interface MetadataChangeEvent {
-	/** Type of entity that changed */
-	type: "tab" | "group";
-	/** ID of the entity that changed */
-	id: Identifier;
-	/** Updated metadata */
-	metadata: APITabMetadata | APIGroupMetadata;
-	/** Source plugin that triggered the change (optional) */
-	source?: string;
+  /** Type of entity that changed */
+  type: "tab" | "group";
+  /** ID of the entity that changed */
+  id: Identifier;
+  /** Updated metadata */
+  metadata: APITabMetadata | APIGroupMetadata;
+  /** Source plugin that triggered the change (optional) */
+  source?: string;
 }
 
 /**
@@ -78,7 +80,7 @@ export interface MetadataChangeEvent {
  *   await vtPlugin.api.setTabIcon(leaf.id, "check", "my-plugin");
  * }
  * ```
- * 
+ *
  * Important: Always provide a source parameter to prevent infinite loops
  * when listening to metadata change events.
  */
@@ -131,49 +133,49 @@ export declare class VerticalTabsAPI {
 
   // ===== Group Customization =====
 
-	/**
-	 * Set custom icon for a group
-	 * @param groupId - ID of the WorkspaceParent
-	 * @param icon - Lucide icon name (e.g., "folder", "star")
-	 * @param source - Optional source identifier to prevent infinite loops
-	 * @returns Promise that resolves when the icon is set
-	 */
-	setGroupIcon(groupId: Identifier, icon: string, source?: string): Promise<void>;
+  /**
+   * Set custom icon for a group
+   * @param groupId - ID of the WorkspaceParent
+   * @param icon - Lucide icon name (e.g., "folder", "star")
+   * @param source - Optional source identifier to prevent infinite loops
+   * @returns Promise that resolves when the icon is set
+   */
+  setGroupIcon(groupId: Identifier, icon: string, source?: string): Promise<void>;
 
-	/**
-	 * Set custom color for a group
-	 * @param groupId - ID of the WorkspaceParent
-	 * @param color - CSS color string (e.g., "#00ff00", "green", "rgb(0,255,0)")
-	 * @param source - Optional source identifier to prevent infinite loops
-	 * @returns Promise that resolves when the color is set
-	 */
-	setGroupColor(groupId: Identifier, color: string, source?: string): Promise<void>;
+  /**
+   * Set custom color for a group
+   * @param groupId - ID of the WorkspaceParent
+   * @param color - CSS color string (e.g., "#00ff00", "green", "rgb(0,255,0)")
+   * @param source - Optional source identifier to prevent infinite loops
+   * @returns Promise that resolves when the color is set
+   */
+  setGroupColor(groupId: Identifier, color: string, source?: string): Promise<void>;
 
-	/**
-	 * Set custom title for a group
-	 * @param groupId - ID of the WorkspaceParent
-	 * @param title - Custom title text
-	 * @param source - Optional source identifier to prevent infinite loops
-	 * @returns Promise that resolves when the title is set
-	 */
-	setGroupTitle(groupId: Identifier, title: string, source?: string): Promise<void>;
+  /**
+   * Set custom title for a group
+   * @param groupId - ID of the WorkspaceParent
+   * @param title - Custom title text
+   * @param source - Optional source identifier to prevent infinite loops
+   * @returns Promise that resolves when the title is set
+   */
+  setGroupTitle(groupId: Identifier, title: string, source?: string): Promise<void>;
 
-	/**
-	 * Get current metadata for a group
-	 * @param groupId - ID of the WorkspaceParent
-	 * @returns Promise that resolves to group metadata or undefined if not found
-	 */
-	getGroupMetadata(groupId: Identifier): Promise<APIGroupMetadata | undefined>;
+  /**
+   * Get current metadata for a group
+   * @param groupId - ID of the WorkspaceParent
+   * @returns Promise that resolves to group metadata or undefined if not found
+   */
+  getGroupMetadata(groupId: Identifier): Promise<APIGroupMetadata | undefined>;
 
-	/**
-	 * Clear all custom metadata for a group
-	 * @param groupId - ID of the WorkspaceParent
-	 * @param source - Optional source identifier to prevent infinite loops
-	 * @returns Promise that resolves when metadata is cleared
-	 */
-	clearGroupMetadata(groupId: Identifier, source?: string): Promise<void>;
+  /**
+   * Clear all custom metadata for a group
+   * @param groupId - ID of the WorkspaceParent
+   * @param source - Optional source identifier to prevent infinite loops
+   * @returns Promise that resolves when metadata is cleared
+   */
+  clearGroupMetadata(groupId: Identifier, source?: string): Promise<void>;
 
-	// ===== Utilities =====
+  // ===== Utilities =====
 
   /**
    * Get API version
@@ -223,7 +225,7 @@ export declare class VerticalTabsAPI {
 
   /**
    * Remove all menu items in a section
-   * 
+   *
    * @param menu - Menu instance to modify
    * @param section - Section name to remove
    */
@@ -231,7 +233,7 @@ export declare class VerticalTabsAPI {
 
   /**
    * Move a section to a new position in the menu
-   * 
+   *
    * @param menu - Menu instance to modify
    * @param section - Section name to move
    * @param after - Section name to place after. If undefined, places at the front.
@@ -241,19 +243,39 @@ export declare class VerticalTabsAPI {
 
   /**
    * Register a callback to add custom menu items to tab context menus
-   * 
+   *
    * @param callback - Function called when a tab menu is being built.
    *                   Receives the Menu instance and the WorkspaceLeaf.
-   * @returns MenuEventRef that can be used to unregister the callback
+   * @returns MenuEventRef with unload() method to unregister the callback
+   *
+   * @example
+   * ```typescript
+   * const ref = api.onTabMenu((menu, leaf) => {
+   *   menu.addItem((item) => {
+   *     item.setTitle("Custom Action").onClick(() => { ... });
+   *   });
+   * });
+   * // Later: ref.unload() to stop receiving events
+   * ```
    */
   onTabMenu(callback: (menu: Menu, leaf: WorkspaceLeaf) => void): MenuEventRef;
 
   /**
    * Register a callback to add custom menu items to group context menus
-   * 
+   *
    * @param callback - Function called when a group menu is being built.
    *                   Receives the Menu instance and the WorkspaceParent.
-   * @returns MenuEventRef that can be used to unregister the callback
+   * @returns MenuEventRef with unload() method to unregister the callback
+   *
+   * @example
+   * ```typescript
+   * const ref = api.onGroupMenu((menu, group) => {
+   *   menu.addItem((item) => {
+   *     item.setTitle("Custom Action").onClick(() => { ... });
+   *   });
+   * });
+   * // Later: ref.unload() to stop receiving events
+   * ```
    */
   onGroupMenu(callback: (menu: Menu, group: WorkspaceParent) => void): MenuEventRef;
 }
@@ -263,8 +285,6 @@ export declare class VerticalTabsAPI {
  *
  * Use this to get proper typing when accessing the plugin:
  * ```typescript
- * import { VerticalTabsPlugin } from "obsidian-vertical-tabs-api";
- *
  * const vtPlugin = app.plugins.getPlugin("vertical-tabs") as VerticalTabsPlugin;
  * if (vtPlugin?.api) {
  *   await vtPlugin.api.setTabIcon(leaf.id, "check");
@@ -273,4 +293,42 @@ export declare class VerticalTabsAPI {
  */
 export interface VerticalTabsPlugin {
   api: VerticalTabsAPI;
+}
+
+/**
+ * Workspace event augmentation for Vertical Tabs plugin
+ *
+ * Subscribe to these events to react to plugin lifecycle and metadata changes:
+ * ```typescript
+ * // Plugin loaded and API is available
+ * this.registerEvent(
+ *   this.app.workspace.on("vertical-tabs:load", () => {
+ *     console.log("Vertical Tabs API is ready");
+ *   })
+ * );
+ *
+ * // Plugin is about to unload
+ * this.registerEvent(
+ *   this.app.workspace.on("vertical-tabs:unload", () => {
+ *     console.log("Vertical Tabs is unloading");
+ *   })
+ * );
+ *
+ * // Tab or group metadata changed
+ * this.registerEvent(
+ *   this.app.workspace.on("vertical-tabs:metadata-changed", (event) => {
+ *     console.log(`${event.type} ${event.id} changed by ${event.source}`);
+ *   })
+ * );
+ * ```
+ */
+declare module "obsidian" {
+  interface Workspace {
+    /** Fired when Vertical Tabs plugin loads and API becomes available */
+    on(name: "vertical-tabs:load", callback: () => void): EventRef;
+    /** Fired when Vertical Tabs plugin unloads */
+    on(name: "vertical-tabs:unload", callback: () => void): EventRef;
+    /** Fired when tab or group metadata changes */
+    on(name: "vertical-tabs:metadata-changed", callback: (event: MetadataChangeEvent) => void): EventRef;
+  }
 }
