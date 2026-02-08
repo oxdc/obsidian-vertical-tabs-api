@@ -222,6 +222,24 @@ export declare class VerticalTabsAPI {
   // ===== Menu Customization =====
 
   /**
+   * Remove all menu items in a section
+   * 
+   * @param menu - Menu instance to modify
+   * @param section - Section name to remove
+   */
+  removeMenuSection(menu: Menu, section: string): void;
+
+  /**
+   * Move a section to a new position in the menu
+   * 
+   * @param menu - Menu instance to modify
+   * @param section - Section name to move
+   * @param after - Section name to place after. If undefined, places at the front.
+   *                If the target section is not found, does nothing.
+   */
+  placeSectionAfter(menu: Menu, section: string, after?: string): void;
+
+  /**
    * Register a callback to add custom menu items to tab context menus
    * 
    * @param callback - Function called when a tab menu is being built.
