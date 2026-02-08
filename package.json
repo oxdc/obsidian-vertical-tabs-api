@@ -1,7 +1,7 @@
 {
   "name": "obsidian-vertical-tabs-api",
   "version": "1.0.0",
-  "description": "Public API for customizing tabs and groups in the Vertical Tabs plugin for Obsidian",
+  "description": "API for customizing with Vertical Tabs for Obsidian",
   "main": "index.d.ts",
   "types": "index.d.ts",
   "files": [
