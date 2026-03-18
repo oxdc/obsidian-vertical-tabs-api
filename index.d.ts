@@ -292,6 +292,15 @@ export declare class VerticalTabsAPI {
    * ```
    */
   onGroupMenu(callback: (menu: Menu, group: WorkspaceParent) => void): MenuEventRef;
+
+  /**
+   * Check if a menu was created by Vertical Tabs
+   *
+   * @param menu - Menu instance to check
+   * @returns `true` if the menu was created by Vertical Tabs, `false` otherwise
+   * @since 1.0.1
+   */
+  isVTMenu(menu: Menu): boolean;
 }
 
 /**
@@ -343,6 +352,36 @@ export interface VerticalTabsPlugin {
  * );
  * ```
  */
+declare module "obsidian" {
+  interface Menu {
+    /**
+     * Set when `isVTMenu` is `true`. Identifies the specific Vertical Tabs menu that was opened.
+     *
+     * Possible values:
+     * - `"vt-tab-menu"` — tab context menu
+     * - `"vt-group-menu"` — group context menu
+     * - `"vt-sort-menu"` — sort menu in the navigation header
+     * - `"vt-tab-switcher-menu"` — tab switcher menu
+     * - `"vt-status-bar-menu"` — zen mode status bar menu
+     * - `"vt-nav-history-menu"` — navigation history menu (back/forward)
+     *
+     * @since 1.0.1
+     */
+    VTMenuAttribute?: string;
+  }
+
+  interface App {
+    /**
+     * Get the Vertical Tabs plugin instance
+     *
+     * @returns The plugin instance if installed and enabled, `null` otherwise
+     */
+    plugins: {
+      getPlugin: (id: "vertical-tabs") => VerticalTabsPlugin | null;
+    }
+  }
+}
+
 declare module "obsidian" {
   interface Workspace {
     /** Fired when Vertical Tabs plugin loads and API becomes available */
