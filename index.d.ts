@@ -6,7 +6,7 @@
  * @packageDocumentation
  */
 
-import { WorkspaceLeaf, WorkspaceParent, Menu } from "obsidian";
+import { WorkspaceLeaf, WorkspaceParent, Menu, EventRef } from "obsidian";
 
 /**
  * Event reference for menu callbacks
@@ -29,7 +29,7 @@ export type Identifier = string;
 export declare const API_VERSION = "1.0.0";
 
 /**
- * Metadata for a tab including custom icon, color, and title
+ * Metadata for a tab including custom icon, color, title, and ephemeral status
  */
 export interface APITabMetadata {
   /** Unique identifier for the tab */
@@ -40,6 +40,8 @@ export interface APITabMetadata {
   color?: string;
   /** Custom title override */
   title?: string;
+  /** Whether the tab is ephemeral (available in version 1.1.0 and later) */
+  isEphemeral?: boolean;
 }
 
 /**
@@ -129,6 +131,20 @@ export declare class VerticalTabsAPI {
    * @returns Promise that resolves when the title is set
    */
   setTabTitle(leafId: Identifier, title: string, source?: string): Promise<void>;
+
+  /**
+   * Set ephemeral status for a tab
+   * 
+   * Ephemeral tabs are automatically closed when they become inactive and another tab is opened,
+   * similar to preview tabs in VSCode. This is useful for temporary views or quick previews.
+   * 
+   * @param leafId - ID of the WorkspaceLeaf
+   * @param isEphemeral - Whether the tab should be ephemeral
+   * @param source - Optional source identifier to prevent infinite loops
+   * @returns Promise that resolves when the ephemeral status is set
+   * @since 1.1.0
+   */
+  setTabEphemeral(leafId: Identifier, isEphemeral: boolean, source?: string): Promise<void>;
 
   /**
    * Get current metadata for a tab

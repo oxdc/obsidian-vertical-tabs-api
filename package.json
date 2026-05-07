@@ -1,6 +1,6 @@
 {
   "name": "obsidian-vertical-tabs-api",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "API for customizing with Vertical Tabs for Obsidian",
   "main": "index.d.ts",
   "types": "index.d.ts",
@@ -25,6 +25,9 @@
   "homepage": "https://github.com/oxdc/obsidian-vertical-tabs-api#readme",
   "bugs": {
     "url": "https://github.com/oxdc/obsidian-vertical-tabs/issues"
+  },
+  "sponsor": {
+    "url": "https://ko-fi.com/oxdcq"
   },
   "peerDependencies": {
     "obsidian": "^1.6.2"
