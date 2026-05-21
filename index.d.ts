@@ -26,7 +26,7 @@ export type Identifier = string;
 /**
  * API version following semantic versioning
  */
-export declare const API_VERSION = "1.0.0";
+export declare const API_VERSION = "1.2.0";
 
 /**
  * Metadata for a tab including custom icon, color, title, and ephemeral status
@@ -45,7 +45,33 @@ export interface APITabMetadata {
 }
 
 /**
- * Metadata for a group including custom icon, color, and title
+ * View type for a group (available since API v1.2.0)
+ */
+export enum GroupViewType {
+  /** Default stacked/tab view */
+  Default = "vt-default-view",
+  /** Continuous scroll view showing all tab contents */
+  ContinuousView = "vt-continuous-view",
+  /** Side-by-side column view */
+  ColumnView = "vt-column-view",
+  /** Fullscreen grid overview of all tabs */
+  MissionControlView = "vt-mission-control-view",
+}
+
+/**
+ * Persisted data for a linked folder (available since API v1.2.0)
+ */
+export interface LinkedFolderData {
+  /** Vault-relative path of the linked folder */
+  path: string;
+  /** Whether the folder was opened recursively */
+  recursive: boolean;
+  /** Number of files already opened (pagination offset) */
+  offset: number;
+}
+
+/**
+ * Metadata for a group including custom icon, color, title, view type, and visibility state
  */
 export interface APIGroupMetadata {
   /** Unique identifier for the group */
@@ -56,6 +82,26 @@ export interface APIGroupMetadata {
   color?: string;
   /** Custom title override */
   title?: string;
+  /**
+   * Current view type for this group
+   * @since 1.2.0
+   */
+  viewType?: GroupViewType;
+  /**
+   * Linked folder data if this group is linked to a vault folder
+   * @since 1.2.0
+   */
+  linkedFolder?: LinkedFolderData;
+  /**
+   * Whether the group is hidden
+   * @since 1.2.0
+   */
+  isHidden?: boolean;
+  /**
+   * Whether the group is collapsed
+   * @since 1.2.0
+   */
+  isCollapsed?: boolean;
 }
 
 /**
@@ -204,6 +250,53 @@ export declare class VerticalTabsAPI {
    * @returns Promise that resolves when metadata is cleared
    */
   clearGroupMetadata(groupId: Identifier, source?: string): Promise<void>;
+
+  /**
+   * Set the view type for a group
+   *
+   * The view type controls how tabs are displayed within the group:
+   * - `Default` — standard stacked/tab view
+   * - `ContinuousView` — all tab contents scrolled continuously
+   * - `ColumnView` — tabs displayed side-by-side
+   * - `MissionControlView` — fullscreen thumbnail grid of all tabs
+   *
+   * The view type is persisted and restored on Obsidian restart.
+   *
+   * @param groupId - ID of the WorkspaceParent
+   * @param viewType - Target view type (use `GroupViewType` enum)
+   * @param source - Optional source identifier to prevent infinite loops
+   * @returns Promise that resolves when the view type is applied and saved
+   * @since 1.2.0
+   */
+  setGroupViewType(groupId: Identifier, viewType: GroupViewType, source?: string): Promise<void>;
+
+  /**
+   * Set the hidden state of a group
+   *
+   * Hidden groups are not visible in the workspace but remain open. They can be
+   * shown again by calling `setGroupHidden(id, false)`.
+   *
+   * @param groupId - ID of the WorkspaceParent
+   * @param isHidden - `true` to hide the group, `false` to show it
+   * @param source - Optional source identifier to prevent infinite loops
+   * @returns Promise that resolves when the hidden state is saved
+   * @since 1.2.0
+   */
+  setGroupHidden(groupId: Identifier, isHidden: boolean, source?: string): Promise<void>;
+
+  /**
+   * Set the collapsed state of a group
+   *
+   * Collapsed groups show only their header in the Vertical Tabs sidebar,
+   * hiding the tab list. The tabs remain open.
+   *
+   * @param groupId - ID of the WorkspaceParent
+   * @param isCollapsed - `true` to collapse the group, `false` to expand it
+   * @param source - Optional source identifier to prevent infinite loops
+   * @returns Promise that resolves when the collapsed state is saved
+   * @since 1.2.0
+   */
+  setGroupCollapsed(groupId: Identifier, isCollapsed: boolean, source?: string): Promise<void>;
 
   // ===== Utilities =====
 
