@@ -6,7 +6,7 @@
  * @packageDocumentation
  */
 
-import { WorkspaceLeaf, WorkspaceParent, Menu, EventRef } from "obsidian";
+import { App, WorkspaceLeaf, WorkspaceParent, Menu, EventRef } from "obsidian";
 
 /**
  * Event reference for menu callbacks
@@ -180,10 +180,10 @@ export declare class VerticalTabsAPI {
 
   /**
    * Set ephemeral status for a tab
-   * 
+   *
    * Ephemeral tabs are automatically closed when they become inactive and another tab is opened,
    * similar to preview tabs in VSCode. This is useful for temporary views or quick previews.
-   * 
+   *
    * @param leafId - ID of the WorkspaceLeaf
    * @param isEphemeral - Whether the tab should be ephemeral
    * @param source - Optional source identifier to prevent infinite loops
@@ -428,6 +428,35 @@ export interface VerticalTabsPlugin {
 }
 
 /**
+ * Run a one-off callback with the Vertical Tabs API when it is available.
+ *
+ * Exposed as `window.withVT` while the plugin is loaded (console, user scripts).
+ * In plugin projects, import from `obsidian-vertical-tabs-api`.
+ *
+ * @param fn - Callback receiving the API
+ * @param app - Optional Obsidian app instance (omit in the console; uses `window.app`)
+ * @returns The callback return value, or `undefined` if the API is unavailable (callback not called)
+ *
+ * @example
+ * ```typescript
+ * withVT((api) => {
+ *   console.log(api.getVersion());
+ * });
+ * ```
+ */
+export declare function withVT<T>(fn: (api: VerticalTabsAPI) => T, app?: App): T | undefined;
+
+declare global {
+  interface Window {
+    /**
+     * Global one-off Vertical Tabs API access (console, user scripts).
+     * Present while the plugin is loaded; removed on unload.
+     */
+    withVT?: typeof withVT;
+  }
+}
+
+/**
  * Workspace event augmentation for Vertical Tabs plugin
  *
  * Subscribe to these events to react to plugin lifecycle and metadata changes:
@@ -487,7 +516,7 @@ declare module "obsidian" {
      */
     plugins: {
       getPlugin: (id: "vertical-tabs") => VerticalTabsPlugin | null;
-    }
+    };
   }
 }
 
