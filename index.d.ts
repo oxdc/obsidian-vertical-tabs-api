@@ -26,7 +26,7 @@ export type Identifier = string;
 /**
  * API version following semantic versioning
  */
-export declare const API_VERSION = "1.2.0";
+export declare const API_VERSION = "1.3.0";
 
 /**
  * Metadata for a tab including custom icon, color, title, and ephemeral status
@@ -488,6 +488,15 @@ declare global {
  *     console.log(`New tabs: ${event.newTabs.length}, Closed: ${event.closedTabs.length}`);
  *   })
  * );
+ *
+ * // Paint a sidebar tab icon (available since 1.3.0)
+ * this.registerEvent(
+ *   this.app.workspace.on("vertical-tabs:render-tab-icon", (leaf, iconEl, tabEl) => {
+ *     iconEl.empty();
+ *     iconEl.createSpan({ text: "⭐" });
+ *   })
+ * );
+ * this.app.workspace.trigger("vertical-tabs:request-icon-refresh");
  * ```
  */
 declare module "obsidian" {
@@ -530,5 +539,40 @@ declare module "obsidian" {
     on(name: "vertical-tabs:metadata-changed", callback: (event: MetadataChangeEvent) => void): EventRef;
     /** Fired when tabs or groups are opened or closed (only if changes detected) */
     on(name: "vertical-tabs:refresh", callback: (event: RefreshEvent) => void): EventRef;
+    /**
+     * Fired after Vertical Tabs paints a sidebar tab icon.
+     * Not fired when a user-set Vertical Tabs icon, the Alt+hover grip, or a webview favicon is showing.
+     *
+     * @param leaf - The WorkspaceLeaf associated with the tab
+     * @param iconEl - The icon element of the tab row (in Vertical Tabs sidebar)
+     * @param tabEl - The tab row itself (in Vertical Tabs sidebar)
+     *
+     * @since 1.3.0
+     */
+    on(
+      name: "vertical-tabs:render-tab-icon",
+      callback: (leaf: WorkspaceLeaf, iconEl: HTMLElement, tabEl: HTMLElement) => void
+    ): EventRef;
+    /**
+     * Fired after Vertical Tabs paints a sidebar group icon.
+     * Not fired when a user-set Vertical Tabs group icon is showing.
+     *
+     * @param group - The WorkspaceParent associated with the group
+     * @param iconEl - The icon element of the group row (in Vertical Tabs sidebar)
+     * @param groupEl - The group row itself (in Vertical Tabs sidebar)
+     *
+     * @since 1.3.0
+     */
+    on(
+      name: "vertical-tabs:render-group-icon",
+      callback: (group: WorkspaceParent, iconEl: HTMLElement, groupEl: HTMLElement) => void
+    ): EventRef;
+    /**
+     * Ask Vertical Tabs to re-paint every visible sidebar icon slot.
+     * Trigger this after registering listeners (if Vertical Tabs is already running)
+     * or when your icon data changes. No-op if Vertical Tabs is not loaded.
+     * @since 1.3.0
+     */
+    on(name: "vertical-tabs:request-icon-refresh", callback: () => void): EventRef;
   }
 }
