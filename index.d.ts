@@ -26,7 +26,7 @@ export type Identifier = string;
 /**
  * API version following semantic versioning
  */
-export declare const API_VERSION = "1.3.0";
+export declare const API_VERSION = "1.4.0";
 
 /**
  * Metadata for a tab including custom icon, color, title, and ephemeral status
@@ -384,6 +384,29 @@ export declare class VerticalTabsAPI {
   onTabMenu(callback: (menu: Menu, leaf: WorkspaceLeaf) => void): MenuEventRef;
 
   /**
+   * Register a callback to add custom menu items to the multi-select tab context menu
+   *
+   * Fired when multiple tabs are selected and the user opens a context menu on a selected tab.
+   * `onTabMenu` is not called for that menu.
+   *
+   * @param callback - Function called when a multi-select tab menu is being built.
+   *                   Receives the Menu instance and the selected WorkspaceLeaf objects.
+   * @returns MenuEventRef with unload() method to unregister the callback
+   * @since 1.4.0
+   *
+   * @example
+   * ```typescript
+   * const ref = api.onTabsMenu((menu, leaves) => {
+   *   menu.addItem((item) => {
+   *     item.setTitle("Custom Action").onClick(() => { ... });
+   *   });
+   * });
+   * // Later: ref.unload() to stop receiving events
+   * ```
+   */
+  onTabsMenu(callback: (menu: Menu, leaves: WorkspaceLeaf[]) => void): MenuEventRef;
+
+  /**
    * Register a callback to add custom menu items to group context menus
    *
    * @param callback - Function called when a group menu is being built.
@@ -497,6 +520,15 @@ declare global {
  *   })
  * );
  * this.app.workspace.trigger("vertical-tabs:request-icon-refresh");
+ *
+ * // Add items to a tab context menu (available since 1.4.0)
+ * this.registerEvent(
+ *   this.app.workspace.on("vertical-tabs:on-tab-menu", (menu, leaf) => {
+ *     menu.addItem((item) => {
+ *       item.setTitle("Custom Action").setSection("my-plugin");
+ *     });
+ *   })
+ * );
  * ```
  */
 declare module "obsidian" {
@@ -506,6 +538,7 @@ declare module "obsidian" {
      *
      * Possible values:
      * - `"vt-tab-menu"` — tab context menu
+     * - `"vt-multi-select-menu"` — multi-select tab context menu
      * - `"vt-group-menu"` — group context menu
      * - `"vt-sort-menu"` — sort menu in the navigation header
      * - `"vt-tab-switcher-menu"` — tab switcher menu
@@ -574,5 +607,45 @@ declare module "obsidian" {
      * @since 1.3.0
      */
     on(name: "vertical-tabs:request-icon-refresh", callback: () => void): EventRef;
+    /**
+     * Fired after Vertical Tabs builds a single-tab context menu.
+     * Equivalent to `api.onTabMenu`. Do not register both for the same handler.
+     *
+     * @param menu - The Menu instance being built
+     * @param leaf - The WorkspaceLeaf the menu is for
+     *
+     * @since 1.4.0
+     */
+    on(
+      name: "vertical-tabs:on-tab-menu",
+      callback: (menu: Menu, leaf: WorkspaceLeaf) => void
+    ): EventRef;
+    /**
+     * Fired after Vertical Tabs builds the multi-select tab context menu.
+     * Equivalent to `api.onTabsMenu`. Do not register both for the same handler.
+     * Not fired for a single-tab menu.
+     *
+     * @param menu - The Menu instance being built
+     * @param leaves - The selected WorkspaceLeaf objects
+     *
+     * @since 1.4.0
+     */
+    on(
+      name: "vertical-tabs:on-tabs-menu",
+      callback: (menu: Menu, leaves: WorkspaceLeaf[]) => void
+    ): EventRef;
+    /**
+     * Fired after Vertical Tabs builds a group context menu.
+     * Equivalent to `api.onGroupMenu`. Do not register both for the same handler.
+     *
+     * @param menu - The Menu instance being built
+     * @param group - The WorkspaceParent the menu is for
+     *
+     * @since 1.4.0
+     */
+    on(
+      name: "vertical-tabs:on-group-menu",
+      callback: (menu: Menu, group: WorkspaceParent) => void
+    ): EventRef;
   }
 }
