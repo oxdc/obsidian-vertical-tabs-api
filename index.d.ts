@@ -550,6 +550,40 @@ declare module "obsidian" {
     VTMenuAttribute?: string;
   }
 
+  interface MenuItem {
+    /**
+     * Set on built-in Vertical Tabs menu items. Identifies the specific action.
+     * Absent on separators, plugin-added items, and items copied from Obsidian's pane menu.
+     *
+     * Tab menu (`vt-tab-menu`):
+     * `"bookmark"`, `"bookmark-and-close"`, `"default-view"`, `"continuous-view"`,
+     * `"column-view"`, `"mission-control-view"`, `"close"`, `"close-others"`,
+     * `"close-tabs-to-top"`, `"close-tabs-to-bottom"`, `"close-all"`, `"pin"`,
+     * `"rename"`, `"set-color"`, `"set-icon"`, `"move-to-new-window"`, `"split-right"`,
+     * `"split-down"`, `"open-in-new-window"`, `"move-tab"`, `"copy-as-internal-link"`,
+     * `"copy-as-embed"`, `"insert-as-internal-link"`, `"insert-as-embed"`, `"back"`,
+     * `"forward"`, `"browse-history"`, `"bookmark-history"`, `"open-history-in-new-group"`,
+     * `"clear-history"`, `"inactive"`, `"load-history"`, `"zoom"`, `"zoom-in"`,
+     * `"zoom-out"`, `"reset-zoom"`, `"more-options"`, `"toggle-reader-mode"`,
+     * `"save-to-vault"`, `"new-group"`, `"new-group-with-name"`
+     *
+     * Multi-select menu (`vt-multi-select-menu`):
+     * `"close"`, `"pin-all"`, `"unpin-all"`, `"set-color"`, `"set-icon"`,
+     * `"move-to-new-window"`, `"move-tabs"`, `"copy-as-internal-links"`,
+     * `"copy-as-embeds"`, `"bookmark"`, `"new-group"`, `"new-group-with-name"`
+     *
+     * Group menu (`vt-group-menu`):
+     * `"hide"`, `"rename"`, `"set-color"`, `"set-icon"`, `"default-view"`,
+     * `"continuous-view"`, `"column-view"`, `"mission-control-view"`, `"bookmark-all"`,
+     * `"bookmark-and-close-all"`, `"close-all"`, `"copy-as-internal-links"`,
+     * `"copy-as-list"`, `"copy-as-embeds"`, `"insert-as-internal-links"`,
+     * `"insert-as-list"`, `"insert-as-embeds"`
+     *
+     * @since 1.4.0
+     */
+    VTMenuAction?: string;
+  }
+
   interface App {
     /**
      * Get the Vertical Tabs plugin instance
