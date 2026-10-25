@@ -26,7 +26,7 @@ export type Identifier = string;
 /**
  * API version following semantic versioning
  */
-export declare const API_VERSION = "1.4.0";
+export declare const API_VERSION = "1.5.0";
 
 /**
  * Metadata for a tab including custom icon, color, title, and ephemeral status
@@ -126,6 +126,23 @@ export interface RefreshEvent {
   newTabs: Identifier[];
   /** IDs of newly created groups */
   newGroups: Identifier[];
+  /** IDs of closed tabs */
+  closedTabs: Identifier[];
+  /** IDs of closed groups */
+  closedGroups: Identifier[];
+}
+
+/**
+ * Event data emitted alongside `RefreshEvent`.
+ * Opened tabs and groups are objects; closed ones are IDs.
+ *
+ * @since 1.5.0
+ */
+export interface RefreshChanges {
+  /** Newly opened tabs */
+  newTabs: WorkspaceLeaf[];
+  /** Newly created groups. */
+  newGroups: WorkspaceParent[];
   /** IDs of closed tabs */
   closedTabs: Identifier[];
   /** IDs of closed groups */
@@ -512,6 +529,13 @@ declare global {
  *   })
  * );
  *
+ * // Same timing, with the opened objects instead of their IDs (available since 1.5.0)
+ * this.registerEvent(
+ *   this.app.workspace.on("vertical-tabs:refresh-changes", (event) => {
+ *     for (const leaf of event.newTabs) console.log(leaf.id);
+ *   })
+ * );
+ *
  * // Paint a sidebar tab icon (available since 1.3.0)
  * this.registerEvent(
  *   this.app.workspace.on("vertical-tabs:render-tab-icon", (leaf, iconEl, tabEl) => {
@@ -607,6 +631,11 @@ declare module "obsidian" {
     /** Fired when tabs or groups are opened or closed (only if changes detected) */
     on(name: "vertical-tabs:refresh", callback: (event: RefreshEvent) => void): EventRef;
     /**
+     * Fired with `vertical-tabs:refresh`, but receives the objects instead of their IDs.
+     * @since 1.5.0
+     */
+    on(name: "vertical-tabs:refresh-changes", callback: (event: RefreshChanges) => void): EventRef;
+    /**
      * Fired after Vertical Tabs paints a sidebar tab icon.
      * Not fired when a user-set Vertical Tabs icon, the Alt+hover grip, or a webview favicon is showing.
      *
@@ -618,7 +647,7 @@ declare module "obsidian" {
      */
     on(
       name: "vertical-tabs:render-tab-icon",
-      callback: (leaf: WorkspaceLeaf, iconEl: HTMLElement, tabEl: HTMLElement) => void
+      callback: (leaf: WorkspaceLeaf, iconEl: HTMLElement, tabEl: HTMLElement) => void,
     ): EventRef;
     /**
      * Fired after Vertical Tabs paints a sidebar group icon.
@@ -632,7 +661,7 @@ declare module "obsidian" {
      */
     on(
       name: "vertical-tabs:render-group-icon",
-      callback: (group: WorkspaceParent, iconEl: HTMLElement, groupEl: HTMLElement) => void
+      callback: (group: WorkspaceParent, iconEl: HTMLElement, groupEl: HTMLElement) => void,
     ): EventRef;
     /**
      * Ask Vertical Tabs to re-paint every visible sidebar icon slot.
@@ -650,10 +679,7 @@ declare module "obsidian" {
      *
      * @since 1.4.0
      */
-    on(
-      name: "vertical-tabs:on-tab-menu",
-      callback: (menu: Menu, leaf: WorkspaceLeaf) => void
-    ): EventRef;
+    on(name: "vertical-tabs:on-tab-menu", callback: (menu: Menu, leaf: WorkspaceLeaf) => void): EventRef;
     /**
      * Fired after Vertical Tabs builds the multi-select tab context menu.
      * Equivalent to `api.onTabsMenu`. Do not register both for the same handler.
@@ -664,10 +690,7 @@ declare module "obsidian" {
      *
      * @since 1.4.0
      */
-    on(
-      name: "vertical-tabs:on-tabs-menu",
-      callback: (menu: Menu, leaves: WorkspaceLeaf[]) => void
-    ): EventRef;
+    on(name: "vertical-tabs:on-tabs-menu", callback: (menu: Menu, leaves: WorkspaceLeaf[]) => void): EventRef;
     /**
      * Fired after Vertical Tabs builds a group context menu.
      * Equivalent to `api.onGroupMenu`. Do not register both for the same handler.
@@ -677,9 +700,6 @@ declare module "obsidian" {
      *
      * @since 1.4.0
      */
-    on(
-      name: "vertical-tabs:on-group-menu",
-      callback: (menu: Menu, group: WorkspaceParent) => void
-    ): EventRef;
+    on(name: "vertical-tabs:on-group-menu", callback: (menu: Menu, group: WorkspaceParent) => void): EventRef;
   }
 }
