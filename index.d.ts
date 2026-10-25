@@ -26,7 +26,7 @@ export type Identifier = string;
 /**
  * API version following semantic versioning
  */
-export declare const API_VERSION = "1.5.0";
+export declare const API_VERSION = "1.6.0";
 
 /**
  * Metadata for a tab including custom icon, color, title, and ephemeral status
@@ -147,6 +147,47 @@ export interface RefreshChanges {
   closedTabs: Identifier[];
   /** IDs of closed groups */
   closedGroups: Identifier[];
+}
+
+/**
+ * Metadata for a Session (i.e., saved workspace layout)
+ *
+ * @since 1.6.0
+ */
+export interface APISession {
+  /** Unique identifier for the session */
+  id: string;
+  /** Session name */
+  name: string;
+  /** Creation time (ms since epoch) */
+  createdAt: number;
+  /** Last save time (ms since epoch) */
+  updatedAt: number;
+  /** Last time the session was made current (ms since epoch) */
+  lastVisitedAt: number;
+}
+
+/**
+ * Kind of change reported by `vertical-tabs:session-changed`
+ *
+ * @since 1.6.0
+ */
+export type SessionChangeAction = "create" | "fork" | "rename" | "switch" | "delete";
+
+/**
+ * Event data emitted when a session is created, forked, renamed, switched to, or deleted
+ *
+ * @since 1.6.0
+ */
+export interface SessionChangeEvent {
+  /** What happened */
+  action: SessionChangeAction;
+  /** The session that was created, forked, renamed, switched to, or deleted */
+  sessionId: string;
+  /** Session metadata after the change. Omitted for `"delete"`. */
+  session?: APISession;
+  /** The current session after the change */
+  currentSessionId: string | null;
 }
 
 /**
@@ -314,6 +355,93 @@ export declare class VerticalTabsAPI {
    * @since 1.2.0
    */
   setGroupCollapsed(groupId: Identifier, isCollapsed: boolean, source?: string): Promise<void>;
+
+  // ===== Sessions =====
+
+  /**
+   * List all sessions, most recently visited first
+   * @since 1.6.0
+   */
+  listSessions(): Promise<APISession[]>;
+
+  /**
+   * Get the ID of the current session
+   * @returns The current session ID, or `null` before sessions have started
+   * @since 1.6.0
+   */
+  getCurrentSessionId(): string | null;
+
+  /**
+   * Get the metadata of the current session
+   * @returns The current session, or `null` if there is none
+   * @since 1.6.0
+   */
+  getCurrentSession(): APISession | null;
+
+  /**
+   * Check whether a session exists
+   * @param sessionId - ID of the session
+   * @since 1.6.0
+   */
+  hasSession(sessionId: string): Promise<boolean>;
+
+  /**
+   * Create a session with an empty workspace and switch to it
+   *
+   * The current session is saved first. A blank name becomes "Untitled".
+   *
+   * @param name - Session name
+   * @returns The new session
+   * @since 1.6.0
+   */
+  createSession(name: string): Promise<APISession>;
+
+  /**
+   * Copy the current workspace into a new session and switch to it
+   *
+   * The current session is saved first. A blank name becomes "Untitled".
+   *
+   * @param name - Session name
+   * @returns The new session
+   * @since 1.6.0
+   */
+  forkSession(name: string): Promise<APISession>;
+
+  /**
+   * Rename a session. A blank name becomes "Untitled". Does nothing if the session does not exist.
+   * @param sessionId - ID of the session
+   * @param name - New name
+   * @since 1.6.0
+   */
+  renameSession(sessionId: string, name: string): Promise<void>;
+
+  /**
+   * Switch to a session
+   *
+   * The current session is saved first. Does nothing if `sessionId` is already current.
+   *
+   * @param sessionId - ID of the session
+   * @throws Error if the session does not exist
+   * @since 1.6.0
+   */
+  switchSession(sessionId: string): Promise<void>;
+
+  /**
+   * Delete a session
+   *
+   * Deleting the current session switches to the most recently visited remaining session,
+   * or creates a "Default" session if none remain. Does nothing if the session does not exist.
+   *
+   * @param sessionId - ID of the session
+   * @since 1.6.0
+   */
+  deleteSession(sessionId: string): Promise<void>;
+
+  /**
+   * Save the current workspace into the current session immediately
+   * @since 1.6.0
+   */
+  saveCurrentSession(): Promise<void>;
 
   // ===== Utilities =====
 
@@ -701,5 +829,11 @@ declare module "obsidian" {
      * @since 1.4.0
      */
     on(name: "vertical-tabs:on-group-menu", callback: (menu: Menu, group: WorkspaceParent) => void): EventRef;
+    /**
+     * Fired after a session is created, forked, renamed, switched to, or deleted.
+     * Not fired for autosave or `saveCurrentSession`.
+     * @since 1.6.0
+     */
+    on(name: "vertical-tabs:session-changed", callback: (event: SessionChangeEvent) => void): EventRef;
   }
 }
